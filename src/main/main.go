@@ -3,26 +3,18 @@ package main
 import (
 	"net/http"
 	"log"
-	"github.com/gorilla/mux"
-	"blogOnGo/src/models"
+	"gopkg.in/mgo.v2"
 )
 
-
 func main() {
-	r := mux.NewRouter()
-	api := r.PathPrefix("/api").Subrouter()
-
-	api.HandleFunc("/",apiHandler)
-
-
-	http.Handle("/", r)
-
-	log.Println("Listening on PORT 3000")
-	http.ListenAndServe(":3000", nil)
+	router := NewRouter()
+	log.Fatal(http.ListenAndServe(":3000", router))
 }
 
-func apiHandler(w http.ResponseWriter, r *http.Request)  {
-	w.Write([]byte("Listened to api"))
-	u := models.User{FirstName: "Jibin", LastName: "Mathews2"}
-	u.Save()
+func getSession() *mgo.Session{
+	s,err := mgo.Dial("mongodb://localhost:27017")
+	if err!=nil{
+		panic(err)
+	}
+	return s
 }
