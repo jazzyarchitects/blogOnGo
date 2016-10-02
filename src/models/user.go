@@ -1,37 +1,19 @@
 package models
 
 import (
-	"encoding/json"
-	"log"
-	"io/ioutil"
+	_ "encoding/json"
+	_ "log"
+	_ "io/ioutil"
 	//"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 type User struct {
-	ID bson.ObjectId `bson:"_id",omitempty`
-	FirstName string
-	LastName  string
-	Age       int
-	Email     string
+	Id bson.ObjectId `bson:"_id" json:"id"`
+	FirstName string `bson:"fname" json:"fname"`
+	LastName  string `bson:"lname" json:"lname"`
+	Age       uint64 `bson:"age" json:"age"`
+	Email     string `bson:"email" json:"email"`
 }
 
 type Users []User
-
-func (u *User) Save() {
-	//filename := "./data/" + u.FirstName + u.LastName + ".json"
-	//data, err := json.Marshal(u)
-	//if err != nil {
-	//	log.Println("Error saving user")
-	//	return
-	//}
-	//log.Println("Data: " + string(data[:]))
-	//err = ioutil.WriteFile(filename, data, 0644)
-	//if err != nil {
-	//	log.Fatal("Error writing: " + err.Error())
-	//}
-}
-
-func (u *User)GetAllUsers() Users {
-
-}

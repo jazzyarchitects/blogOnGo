@@ -3,6 +3,7 @@ package main
 import (
 	_ "blogOnGo/src/models"
 	"net/http"
+	_ "blogOnGo/src/controllers"
 )
 
 type Route struct {
@@ -14,17 +15,17 @@ type Route struct {
 
 type Routes []Route
 
-var routes = Routes{
+var RoutesList = Routes{
 	Route{
 		"GetAllUsers",
 		"GET",
 		"/user",
-		"models.User.GetAllUsers",
+		"controllers.UserController.GetUsers",
 	},
 	Route{
 		"GetUserById",
 		"GET",
 		"/user/{userId}",
-		"model.User.GetUserById",
+		"controllers.UserController.GetUserById",
 	},
 }
