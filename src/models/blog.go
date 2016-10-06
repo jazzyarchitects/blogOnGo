@@ -4,9 +4,8 @@ import "gopkg.in/mgo.v2/bson"
 
 type Blog struct {
 	Id bson.ObjectId `bson:"_id" json:"id"`
-	FirstName string `bson:"fname" json:"fname"`
-	LastName  string `bson:"lname" json:"lname"`
-	Age       uint64 `bson:"age" json:"age"`
-	Email     string `bson:"email" json:"email"`
-	Password 	string `bson:"password" json:"password"`
+	Title string `bson:"title" json:"title"`
+	Description string `bson:"description" json:"description"`
+	Likes int64 `bson:"likes" json:"likes"`
+	LikedBy []bson.ObjectId `bson:"likedBy" json:"likedBy"`
 }
