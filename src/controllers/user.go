@@ -30,6 +30,7 @@ func NewUserController(s *mgo.Session) *UserController{
 	return &UserController{s}
 }
 
+
 func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	var us []models.User
 
@@ -54,7 +55,6 @@ func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, "%s", usersJson)
-	//fmt.Fprint(w, usersJson)
 
 }
 
@@ -94,6 +94,8 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request){
 	log.Println(r.Form)
 
 	age,err := strconv.ParseUint(r.FormValue("age"),10,64)
+	password := getPasswordHash(r.FormValue("password"))
+
 	if err!=nil{
 		panic(err)
 	}
@@ -102,6 +104,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request){
 		LastName: r.FormValue("lname"),
 		Age: age,
 		Email: r.FormValue("email"),
+		Password: password,
 	}
 
 
