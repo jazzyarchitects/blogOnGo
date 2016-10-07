@@ -42,7 +42,7 @@ func (uc UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 	}
 
-	log.Println(us)
+	//log.Println(us)
 
 	usersJson, err:= json.Marshal(us)
 
