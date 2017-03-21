@@ -21,14 +21,25 @@ func NewRouter() *mux.Router {
 	if err!=nil{
 		panic(err)
 	}
-	userController := controllers.NewUserController(session)
+
+	//----------------User Routes-------------------
 
 	userRouter := router.PathPrefix("/user").Subrouter()
+	userController := controllers.NewUserController(session)
 
 	userRouter.HandleFunc("/{id}", userController.GetUserById).Methods("GET")
 	userRouter.HandleFunc("/{id}", userController.RemoveUser).Methods("DELETE")
 	userRouter.HandleFunc("/", userController.GetUsers).Methods("GET")
 	userRouter.HandleFunc("/", userController.CreateUser).Methods("POST")
+
+	//----------------Blog Routes-------------------
+
+	blogRouter := router.PathPrefix("/blog").Subrouter()
+	blogController := controllers.NewBlogController(session)
+
+	blogRouter.HandleFunc("/{id}", blogController.GetBlogByToken).Methods("GET")
+	blogRouter.HandleFunc("/{id}", blogController.UpdateBlog).Methods("PUT")
+	blogRouter.HandleFunc("/", blogController.GetBlogFeed).Methods("GET")
 
 	return router
 }

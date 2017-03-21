@@ -1,6 +1,10 @@
 package controllers
 
-import "golang.org/x/crypto/scrypt"
+import (
+	"golang.org/x/crypto/scrypt"
+	"math/rand"
+	"time"
+)
 
 func getPasswordHash(password string) string{
 	dk,err := scrypt.Key([]byte(password), []byte("MyRandomSalt"),16384,8,1,12);
@@ -10,3 +14,14 @@ func getPasswordHash(password string) string{
 	return string(dk);
 }
 
+func getRandomString(length int) string{
+	var result string = ""
+	allowed := "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ123456789$-";
+
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	for i:=0;i<length;i++{
+		result += string(allowed[rand.Intn(len(allowed))]);
+	}
+	return result;
+}
