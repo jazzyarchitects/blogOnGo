@@ -78,6 +78,11 @@ func (bc BlogController)GetBlogByToken(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", blogJSON)
 }
 
+func (bc BlogController)CreateBlog(w http.ResponseWriter, r *http.Request){
+	r.ParseForm()
+	fmt.Println(r.Form)
+}
+
 func (bc BlogController)UpdateBlog(w http.ResponseWriter, r *http.Request) {
 	//p := mux.Vars(r)
 	//id := p["id"]

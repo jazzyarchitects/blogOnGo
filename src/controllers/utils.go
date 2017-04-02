@@ -14,7 +14,7 @@ func getPasswordHash(password string) string{
 	return string(dk);
 }
 
-func getRandomString(length int) string{
+func GetRandomString(length int) string{
 	var result string = ""
 	allowed := "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ123456789$-";
 

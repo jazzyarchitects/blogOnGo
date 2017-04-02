@@ -40,6 +40,7 @@ func NewRouter() *mux.Router {
 	blogRouter.HandleFunc("/{id}", blogController.GetBlogByToken).Methods("GET")
 	blogRouter.HandleFunc("/{id}", blogController.UpdateBlog).Methods("PUT")
 	blogRouter.HandleFunc("/", blogController.GetBlogFeed).Methods("GET")
+	blogRouter.HandleFunc("/", blogController.CreateBlog).Methods("POST")
 
 	return router
 }
