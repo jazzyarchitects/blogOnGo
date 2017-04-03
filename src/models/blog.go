@@ -7,6 +7,5 @@ type Blog struct {
 	Token string `bson:"token" json:"id"`
 	Title string `bson:"title" json:"title"`
 	Description string `bson:"description" json:"description"`
-	Likes int64 `bson:"likes" json:"likes"`
 	LikedBy []bson.ObjectId `bson:"likedBy" json:"likedBy"`
 }

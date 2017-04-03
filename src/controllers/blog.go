@@ -25,26 +25,29 @@ func NewBlogController(s *mgo.Session) *BlogController {
 	return &BlogController{s}
 }
 
+/*
+This will retrieve a list of all the blogs stored in the database\
+ */
 func (bc BlogController)GetBlogFeed(w http.ResponseWriter, r *http.Request) {
 	pageQuery := r.URL.Query()["page"]
 
 	var page int;
 
 	if len(pageQuery) > 0 {
-		page,_ = strconv.Atoi(pageQuery[0])
-	}else{
+		page, _ = strconv.Atoi(pageQuery[0])
+	} else {
 		page = 1
 	}
 	var blogs []models.Blog
 
-	err := blogCollection.Find(nil).Limit(blogLimit).Skip((page-1)*blogLimit).All(&blogs)
-	if err!=nil{
+	err := blogCollection.Find(nil).Limit(blogLimit).Skip((page - 1) * blogLimit).All(&blogs)
+	if err != nil {
 		w.WriteHeader(404)
 	}
 
 	blogsJson, err := json.Marshal(blogs)
 
-	if err!=nil{
+	if err != nil {
 		panic(err)
 	}
 
@@ -53,34 +56,71 @@ func (bc BlogController)GetBlogFeed(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", blogsJson)
 }
 
+
+/*
+This will retrieve a blog stored in the database by id or Token
+ */
 func (bc BlogController)GetBlogByToken(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	p := mux.Vars(r)
 	id := p["id"]
 
-	if !bson.IsObjectIdHex(id) {
-		w.WriteHeader(404)
-		return
-	}
-	//oid := bson.ObjectIdHex(id)
+	fmt.Println(id)
 
 	var blog models.Blog;
-	err := blogCollection.Find(bson.M{}).One(&blog)
 
-	if err != nil {
-		w.WriteHeader(500)
-		panic(err)
+	err := blogCollection.Find(bson.M{"token": id}).One(&blog)
+
+	if err != nil && err.Error() == "not found" {
+		w.WriteHeader(200)
+		fmt.Fprint(w, "{\"success\": true, \"data\": []}")
+		return
 	}
+	//fmt.Println(err)
+	fmt.Println(blog)
 
 	blogJSON, _ := json.Marshal(blog)
 
 	w.WriteHeader(200)
-	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, "%s", blogJSON)
 }
 
-func (bc BlogController)CreateBlog(w http.ResponseWriter, r *http.Request){
+
+/*
+Create a new blog in the database. This function generates a unique token to identify the blog using only 7 characters
+ */
+func (bc BlogController)CreateBlog(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fmt.Println(r.Form)
+
+	blog := models.Blog{
+		Title: r.FormValue("title"),
+		Description: r.FormValue("description"),
+	}
+
+	blog.Id = bson.NewObjectId()
+
+	blog.Token = getUniqueToken(blogCollection)
+
+	blogCollection.Insert(blog)
+
+	b, _ := json.Marshal(blog)
+
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, "%s", b)
+
+}
+
+func getUniqueToken(collection *mgo.Collection) string {
+	token := getRandomString(7)
+	var blogs []models.Blog
+	collection.Find(bson.M{token: token}).All(&blogs)
+	if len(blogs) == 0 {
+		return token
+	} else {
+		return getUniqueToken(collection)
+	}
 }
 
 func (bc BlogController)UpdateBlog(w http.ResponseWriter, r *http.Request) {
