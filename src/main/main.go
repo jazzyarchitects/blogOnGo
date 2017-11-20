@@ -6,11 +6,34 @@ import (
 	"github.com/gorilla/mux"
 	"blogOnGo/src/controllers"
 	"gopkg.in/mgo.v2"
+	"fmt"
+	"net/http/httptest"
+	"net/http/httputil"
 )
+
+
+func logHandler(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+			x, err := httputil.DumpRequest(r, true)
+			if err != nil {
+					http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+					return
+			}
+			log.Println(fmt.Sprintf("%q", x))
+			rec := httptest.NewRecorder()
+			fn(rec, r)
+			log.Println(fmt.Sprintf("%q", rec.Body))            
+	}
+}
+
+func MessageHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "A message was received")
+}
 
 func main() {
 	router := NewRouter()
-	log.Fatal(http.ListenAndServe(":3000", router))
+	router.HandleFunc("/", logHandler(MessageHandler))
+	log.Fatal(http.ListenAndServe(":3005", router))
 }
 
 func NewRouter() *mux.Router {
@@ -21,6 +44,8 @@ func NewRouter() *mux.Router {
 	if err!=nil{
 		panic(err)
 	}
+
+	fmt.Println("Listening on port 3005...");
 
 	//----------------User Routes-------------------
 
@@ -41,6 +66,14 @@ func NewRouter() *mux.Router {
 	blogRouter.HandleFunc("/{id}", blogController.UpdateBlog).Methods("PUT")
 	blogRouter.HandleFunc("/", blogController.GetBlogFeed).Methods("GET")
 	blogRouter.HandleFunc("/", blogController.CreateBlog).Methods("POST")
+
+	//----------------Ping Routes-------------------
+	pingRouter := router.PathPrefix("/ping").Subrouter()
+	pingController := controllers.NewPingController()
+
+	pingRouter.HandleFunc("/", pingController.RespondPing).Methods("GET")
+	pingRouter.HandleFunc("/swagger", pingController.SendSwagger).Methods("GET")
+	
 
 	return router
 }
